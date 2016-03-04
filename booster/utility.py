@@ -6,6 +6,7 @@ Stuff like playing and reading videos.
 
 import numpy as np
 import cv2
+import math
 
 
 __author__     = "Henry Cooney"
@@ -43,8 +44,10 @@ def play_video(vid,
         play_func(title, f)
         if cv2.waitKey(wait) & 0Xff == ord('q'):
             break
+    cv2.destroyWindow(title)
+
     
-def save_video(vid, path, framerate=24.976024):
+def save_video(vid, path, framerate=30.0):
     """ Save the video frame list vid at path.
     Will always use XVID (avi) format."""
     
@@ -66,8 +69,17 @@ def optical_flow(f1, f2):
     
     prev = cv2.cvtColor(f1, cv2.COLOR_BGR2GRAY)
     next = cv2.cvtColor(f2, cv2.COLOR_BGR2GRAY)
-    flow = cv2.calcOpticalFlowFarneback(prev, next, None,
-                                        0.5, 3, 15, 3, 5, 1.2, 0)
+    uflow = np.zeros_like(prev)
+    flow = cv2.calcOpticalFlowFarneback(prev,
+                                        next,
+                                        uflow,
+                                        0.5, # pyr scale
+                                        3,  # levels
+                                        25,  # winsize
+                                        3, # iterations
+                                        7,  # poly_n
+                                        1.5,  # ploy_sigma
+                                        cv2.OPTFLOW_FARNEBACK_GAUSSIAN)
 
     return flow
 
@@ -85,7 +97,6 @@ def show_flow(title, f):
     bgr = flow_to_bgr(f)
     cv2.imshow(title, bgr)
 
-
 def flow_to_bgr(f):
     """ Converts the optical flow frame f to a viewable
     bgr frame. """
@@ -98,11 +109,75 @@ def flow_to_bgr(f):
     bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
     return bgr
     
-    
-    
 def play_flows(fs, title='flows', wait=50):
     play_video(fs, title=title, wait=wait, 
                play_func = lambda t, x: show_flow(t, x))
     
+def make_every_other_frame_black(fs):
+    """ Take a sequence of video frames, fs, and
+    insert a black frame between each one."""
+    new = []
+    for f in fs:
+        new.append(f)
+        new.append(np.zeros_like(fs[0]))
+    return new
 
+def save_frames_to_numpy(fs, path):
+    """ Save frames as a single .npy file """
+    temp = np.stack(fs, axis = 3)
+    np.save(path, temp)
+    
+def load_numpy_video(path):
+    """ Load a video saved as a numpy file, return it 
+    as a list of frames. """
+    mat = np.load(path)
+    fs = []
+    for i in range(mat.shape[3]):
+        fs.append(mat[:,:,:,i])
+    return fs
+    
+def copy_frames(fs):
+    """ return a deep copy of the video frames sequence frames. """
+    new_fs = [np.copy(f) for f in fs]
+    return new_fs
+     
+def view(f, title='frame', wait=0):
+    """ View a single frame f. """
+    while True:
+        cv2.imshow(title, f)
+        if cv2.waitKey(0) & 0Xff == ord('q'):
+            break
+    cv2.destroyWindow(title)
+
+def view_frame_by_frame(fs, title='frame', wait=0):
+    """ View a video frame by frame """
+    if (fs[0].shape[2] == 2):
+        fs = [flow_to_bgr(f) for f in fs]
+    for f in fs:
+        cv2.imshow(title, f)
+        key = cv2.waitKey(0) & 0Xff
+        if key == ord('q'):
+            break
+    cv2.destroyWindow(title)
+
+def clip(f, xr, yr):
+    """ clip the frame f and return only pixels in the range
+    xr, yr """
+    if len(xr) == 1:
+        f = f[:][xr[0]:][:]
+    else:
+        f = f[:][xr[0]:xr[1]][:]
+    if len(yr) == 1:
+        f = f[yr[0]:][:][:]
+    else:
+        f = f[yr[0]:yr[1]][:][:]
+    return f
+    
+    
+def eucdist(c1, c2):
+    """ Return euclidean distance between two colors """
+    c1 = c1.astype('float')
+    c2 = c2.astype('float')
+    return math.sqrt((c1[0]-c2[0])**2 + (c1[1]-c2[1])**2
+                     + (c1[2]-c2[2])**2)
     
