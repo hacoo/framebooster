@@ -7,6 +7,7 @@ from tqdm import tqdm
 import booster.pixels as pix
 import booster.utility as ut
 import booster.geometry as geo
+import math
 
 
 __author__     = "Henry Cooney"
@@ -159,7 +160,7 @@ def color_transfer_occlusions(f0, f1, forward, backward, interp,
     frame. """
     h = interp.shape[0]
     w = interp.shape[1]
-    new_frame = np.zeros_like(f0)
+    new_frame = np.copy(f0)
     imask = find_occlusions(forward, backward, interp, t)
     for row in tqdm(range(h), nested=True, desc="color transfer"):
         for col in range(w):
@@ -205,14 +206,19 @@ def find_occlusion(forward, backward, interp, imask, row, col, t=0.5):
 
         if d0 <= d1:
             imask[row][col][0] = 1
-            if diff < 1.0:
+            if diff < 0.01:
                 imask[row][col][1] = 1
         else:
             imask[row][col][1] = 1
-            if diff < 1.0:
+            if diff < 0.01:
                 imask[row][col][0] = 1
     else:
+        # Default to using first frame
         imask[row][col][0] = 1
 
     
 
+def eucdist(u, v):
+    """ Return the euclidean distance between vectors u and v """
+    return math.sqrt((u[0]-v[0])**2 + (u[1]-v[1])**2)
+    

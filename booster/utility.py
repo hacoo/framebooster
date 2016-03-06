@@ -7,6 +7,12 @@ Stuff like playing and reading videos.
 import numpy as np
 import cv2
 import math
+import os
+import glob
+import shutil
+import subprocess
+from tqdm import tqdm
+import booster.flo as flo
 
 
 __author__     = "Henry Cooney"
@@ -180,4 +186,63 @@ def eucdist(c1, c2):
     c2 = c2.astype('float')
     return math.sqrt((c1[0]-c2[0])**2 + (c1[1]-c2[1])**2
                      + (c1[2]-c2[2])**2)
+
+
+def save_video_frames(frames, path):
+    """ Save each frame in frames to its own image file. """
+    for i in range(len(frames)):
+        fpath = path + "/frame" + str(i) + ".ppm"
+        cv2.imwrite(fpath, frames[i])
     
+
+def calc_flows_forward_brox(frames, inpath, outpath, ldof_path):
+    """ Calculate forward flows for frames, save
+    to directory at outpath """
+    
+    for i in tqdm(range(len(frames)-1),
+                  desc="calculating forward flows"):
+        first = inpath + "/frame" + str(i) + ".ppm"
+        second = inpath + "/frame" + str(i+1) + ".ppm"
+        subprocess.call([ldof_path, first, second])
+
+        outf = "/frame" + str(i) + "LDOF"
+        shutil.move(inpath + outf +".ppm", outpath + outf +".ppm")
+        shutil.move(inpath + outf +".flo", outpath + outf +".flo")
+        
+        
+def calc_flows_backward_brox(frames, inpath, outpath, ldof_path):
+    """ Calculate forward flows for frames, save
+    to directory at outpath """
+    
+    for i in tqdm(range(len(frames)-1),
+                  desc="calculating forward flows"):
+        first = inpath + "/frame" + str(i) + ".ppm"
+        second = inpath + "/frame" + str(i+1) + ".ppm"
+        subprocess.call([ldof_path, second, first])
+        
+        outf = "/frame" + str(i+1) + "LDOF"
+        shutil.move(inpath + outf +".ppm", outpath + outf +".ppm")
+        shutil.move(inpath + outf +".flo", outpath + outf +".flo")
+
+
+def load_forward_flows(frames, path):
+    """ Load all forward flows at path, resulting from 
+    original footage frames """
+    
+    flows = []
+    for i in range(len(frames)-1):
+        fp = path + "/frame" + str(i) + "LDOF" + ".flo"
+        flows.append(flo.load_flo(fp))
+    return flows
+
+
+def load_backward_flows(frames, path):
+    """ Load all forward flows at path, resulting from 
+    original footage frames """
+    
+    flows = []
+    for i in range(len(frames)-1):
+        fp = path + "/frame" + str(i+1) + "LDOF" + ".flo"
+        flows.append(flo.load_flo(fp))
+    return flows
+

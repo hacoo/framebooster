@@ -149,7 +149,7 @@ def interpolate_frames_occlusions(frames, forwards, backwards, t=0.5):
     while len(frames) > 1:
         flow = pix.splat_motions_bidi(forwards[0], backwards[0],
                                       frames[0], frames[1], t)
-        flow = cv2.GaussianBlur(flow, (7,7), 8)
+        flow = cv2.GaussianBlur(flow, (11, 11), 10)
         interpolated = ct.color_transfer_occlusions(frames[0],
                                                     frames[1],
                                                     forwards[0],

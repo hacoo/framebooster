@@ -165,6 +165,7 @@ def splat_forward(forward, frame0, frame1, splatty,
     ux = motion[0]/w
     uy = -motion[1]/h
     (x, y) = image_to_cartesian(frame0, col, row)
+    # xp and yp are the coordinates in the interpolated image
     xp = x + t*ux
     yp = y + t*uy
     splats = splat(splatty, xp, yp)
@@ -193,18 +194,18 @@ def splat_backward(backward, frame0, frame1, splatty,
     motion = -1*backward[row][col]
     # Scale to cartesian space
     ux = motion[0]/w
-    uy = -motion[1]/h
+    uy = motion[1]/h
     (x, y) = image_to_cartesian(frame0, col, row)
-    xp = x - t*ux
-    yp = y - t*uy
+    # xp and yp are the coordinates in the interpolated image.
+    xp = x + t*ux
+    yp = y + t*uy
     splats = splat(splatty, xp, yp)
     for s in splats:
         if check_indices(splatty, s[0], s[1]):
-            if check_indices(splatty, s[0], s[1]):
-              old = splatty[s[1]][s[0]]
-              if np.isnan(old[0]) or np.isnan(old[1]):
+            old = splatty[s[1]][s[0]]
+            if np.isnan(old[0]) or np.isnan(old[1]):
                 splatty[s[1]][s[0]] = motion
-              else:
+            else:
                 old_ptc = follow_intensity(frame0, frame1,
                                            old, s[1], s[0], t)
                 new_ptc = follow_intensity(frame0, frame1,
@@ -225,10 +226,10 @@ def splat_motions_bidi(forward, backward, frame0, frame1, t=0.5):
         for col in range(w):
             splat_forward(forward, frame0, frame1, splatty,
                           row, col, t)
-    #for row in tqdm(range(h), nested=True, desc="splatting backward"):
-     #   for col in range(w):
-      #      splat_backward(backward, frame0, frame1, splatty,
-       #                    row, col, t)
+    for row in tqdm(range(h), nested=True, desc="splatting backward"):
+        for col in range(w):
+            splat_backward(backward, frame0, frame1, splatty,
+                           row, col, t)
 
     # Fill holes twice to get rid of big holes
     fill_holes(splatty)
@@ -281,7 +282,7 @@ def average_fill(f, indices):
         pass
     else:
         averaged = np.array([u/n, v/n], dtype='float')
-    f[indices[0]][indices[1]] = averaged
+        f[indices[0]][indices[1]] = averaged
     
 def num_nan_neighbors(f, r, c):
     """ Return the number of neighbors of [r][c] that
