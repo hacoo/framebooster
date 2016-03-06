@@ -35,10 +35,10 @@ __repo__       = "https://github.com/hacoo/framebooster.git"
 
 @click.command()
 @click.option("-i", type = click.Path(exists=True),
-              default="./footage/p480/pizzaratshort.avi",
+              default="./in.avi",
               help="Input video path")
 @click.option("-o", type = click.Path(),
-              default="./output/out",
+              default="./out",
               help="Output video path")
 @click.option("--calc-flows/--no-calc-flows", 
               default=True,
@@ -52,11 +52,8 @@ __repo__       = "https://github.com/hacoo/framebooster.git"
               help = "Number of frames to process. 0 will process whole video") 
 
 
-
-
-
-
 def start(i, o, calc_flows, ldof_path, clean, nframes):
+    set_up_directories()
     if clean:
         clean_directories()
 
@@ -71,30 +68,8 @@ def start(i, o, calc_flows, ldof_path, clean, nframes):
                                     ldof_path)
 
     forward = ut.load_forward_flows(frames, "./forward")
-    ut.view_frame_by_frame(forward)
-    
     backward = ut.load_backward_flows(frames, "./backward")
-    ut.view_frame_by_frame(backward)
 
-
-    ut.view_frame_by_frame(frames)
-    # forward = [flo.load_flo("./denseflow/frame4forward.flo"),
-    #            flo.load_flo("./denseflow/frame5forward.flo"),
-    #            flo.load_flo("./denseflow/frame6forward.flo")]
-    # ut.view_frame_by_frame(forward)
-    # forward = [cv2.GaussianBlur(f, (7,7), 8) for f in forward]
-    # backward = [flo.load_flo("./denseflow/frame4backward.flo"),
-    #            flo.load_flo("./denseflow/frame5backward.flo"),
-    #            flo.load_flo("./denseflow/frame6backward.flo")]
-
-    # backward= [cv2.GaussianBlur(b, (7,7), 8) for b in backward]
-    # ut.view_frame_by_frame(backward)
-    # frames = [cv2.imread("./frame4.ppm"),
-    #           cv2.imread("./frame5.ppm"),
-    #           cv2.imread("./frame6.ppm"),
-    #           cv2.imread("./frame7.ppm")]
-    # ut.view_frame_by_frame(frames)
-    
     (interleaved, iflows) = bst.interpolate_frames_occlusions(frames, 
                                                               forward,
                                                               backward)
@@ -107,9 +82,20 @@ def start(i, o, calc_flows, ldof_path, clean, nframes):
 def clean_directories():
     """ Clean out working directories to prepare for a run """
     for dir in ["frames", "backward", "forward"]:
-        files = glob.glob(dir+"/*")
+        files = glob.glob(dir+"/*.ppm")
         for f in files:
             os.remove(f) 
+        files = glob.glob(dir+"/*.flo")
+        for f in files:
+            os.remove(f) 
+
+
+def set_up_directories():
+    """ make sure needed directories are present. """
+    for dir in ["./frames", "./forward", "./backward"]:
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+            
 
 if __name__ == '__main__':
     start()
