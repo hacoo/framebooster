@@ -15,12 +15,12 @@ __repo__       = "https://github.com/hacoo/framebooster.git"
 
 @click.command()
 @click.option("-i", type = click.Path(exists=True),
-              default="./footage/p480/pizzarat.mp4")
+              default="./footage/flyfish-1.mp4")
 @click.option("-o", type = click.Path(),
-              default="./out.avi")
-@click.option("--start", default=6.5)
-@click.option("--stop", default=7.5)
-@click.option("--framerate", default = 29.0)
+              default="./footage/flyfishwalkshort.avi")
+@click.option("--start", default=354.0)
+@click.option("--stop", default=355.0)
+@click.option("--framerate", default = 25.0)
 
 def cut(i, o, start, stop, framerate):
     framecount = 0

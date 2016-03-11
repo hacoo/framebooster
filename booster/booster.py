@@ -125,7 +125,7 @@ def interpolate_frames_bidi(frames, forwards, backwards, t=0.5):
     iflows = []
     while len(frames) > 1:
         flow = pix.splat_motions_bidi(forwards[0], backwards[0],
-                                  frames[0], frames[1], t)
+                                      frames[0], frames[1], t)
         flow = cv2.GaussianBlur(flow, (7,7), 8)
         interpolated = ct.transfer_colors(frames[0], frames[1], flow, t)
         interleaved.append(frames[0])
@@ -136,8 +136,8 @@ def interpolate_frames_bidi(frames, forwards, backwards, t=0.5):
         forwards = forwards[1:]
         backwards = backwards[1:]
         pbar.update(1)
-    interleaved.append(frames[0])
-    return (interleaved, iflows)
+        interleaved.append(frames[0])
+        return (interleaved, iflows)
 
 
 def interpolate_frames_occlusions(frames, forwards, backwards, t=0.5):
@@ -164,8 +164,7 @@ def interpolate_frames_occlusions(frames, forwards, backwards, t=0.5):
         forwards = forwards[1:]
         backwards = backwards[1:]
         pbar.update(1)
-    interleaved.append(frames[0])
-    ut.save_frames_to_numpy(iflows, "./flows/interleaved/flows.npy")
+        ut.save_frames_to_numpy(iflows, "./flows/interleaved/flows.npy")
     return (interleaved, iflows)
 
 

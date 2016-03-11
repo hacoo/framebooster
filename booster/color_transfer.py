@@ -206,11 +206,11 @@ def find_occlusion(forward, backward, interp, imask, row, col, t=0.5):
 
         if d0 <= d1:
             imask[row][col][0] = 1
-            if diff < 0.01:
+            if diff < 0.1:
                 imask[row][col][1] = 1
         else:
             imask[row][col][1] = 1
-            if diff < 0.01:
+            if diff < 0.1:
                 imask[row][col][0] = 1
     else:
         # Default to using first frame

@@ -208,8 +208,7 @@ def calc_flows_forward_brox(frames, inpath, outpath, ldof_path):
         outf = "/frame" + str(i) + "LDOF"
         shutil.move(inpath + outf +".ppm", outpath + outf +".ppm")
         shutil.move(inpath + outf +".flo", outpath + outf +".flo")
-        
-        
+                
 def calc_flows_backward_brox(frames, inpath, outpath, ldof_path):
     """ Calculate forward flows for frames, save
     to directory at outpath """
@@ -224,7 +223,6 @@ def calc_flows_backward_brox(frames, inpath, outpath, ldof_path):
         shutil.move(inpath + outf +".ppm", outpath + outf +".ppm")
         shutil.move(inpath + outf +".flo", outpath + outf +".flo")
 
-
 def load_forward_flows(frames, path):
     """ Load all forward flows at path, resulting from 
     original footage frames """
@@ -234,7 +232,6 @@ def load_forward_flows(frames, path):
         fp = path + "/frame" + str(i) + "LDOF" + ".flo"
         flows.append(flo.load_flo(fp))
     return flows
-
 
 def load_backward_flows(frames, path):
     """ Load all forward flows at path, resulting from 
