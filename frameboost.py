@@ -13,7 +13,6 @@ Online: http://www.cs.cmu.edu/~./siratori/MotionFieldTransfer/index.html
 """
 
 import click
-import cProfile
 import numpy as np
 import cv2
 import pickle
