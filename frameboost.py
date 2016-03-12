@@ -57,14 +57,6 @@ def start(i, o, calc_flows, ldof_path, clean, nframes):
     if clean:
         clean_directories()
     frames = ut.load_video(i)
-
-    # flows  = ut.load_numpy_video("./out.npy")
-    # ut.view_frame_by_frame(flows)
-    # cv2.imwrite("./tennis_interp.ppm", ut.flow_to_bgr(flows[0]))
-    # return
-    #frames = [cv2.imread("./output/swordframes/frame0.ppm"),
-    #           cv2.imread("./output/swordframes/frame1.ppm")]
-    #ut.view_frame_by_frame(frames)
     if nframes != 0:
         frames = frames[0:nframes]
     ut.save_video_frames(frames, "./frames")
