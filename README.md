@@ -4,6 +4,8 @@ Framebooster is a optical-flow based video frame interpolator. Given
 a video, it will interpolate every other frame -- resulting in a video
 with the frame rate doubled. It is written in Python with OpenCV.
 
+If you're just interested in results, take a look in the example_outputs folder :)
+
 Setup:
 
 This program requires Python 3 and OpenCV. See http://docs.opencv.org/2.4/doc/tutorials/introduction/linux_install/linux_install.html
