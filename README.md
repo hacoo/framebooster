@@ -1,10 +1,12 @@
 # framebooster
 
 Framebooster is a optical-flow based video frame interpolator. Given
-a video, it will interpolate every other frame -- resulting in a video
+a video, it will interpolate intermediate frames -- resulting in a video
 with the frame rate doubled. It is written in Python with OpenCV.
 
 If you're just interested in results, take a look in the example_outputs folder. The results are fairly good, although some edge artifacts remain. Note that output videos will appear to be in slow motion, as they have twice as many frames, but the same playback rate.
+
+I use the Large-Displacement Optical Flow (LDOF) algorithm to compute optical flows; in my testing, this resultid in considerably better quality than other methods (e.g., Lucas-Kanade). You can find the LDOF paper here: https://lmb.informatik.uni-freiburg.de/people/brox/pub/brox_tpami10_ldof.pdf
 
 Setup:
 
